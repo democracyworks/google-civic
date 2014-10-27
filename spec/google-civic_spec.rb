@@ -4,7 +4,7 @@ require 'helper'
 describe GoogleCivic do
   describe ".respond_to?" do
     it "should be true if method exists" do
-      GoogleCivic.respond_to?(:new, true).should be_true
+      GoogleCivic.respond_to?(:new, true).should be_truthy
     end
   end
 
@@ -16,7 +16,7 @@ describe GoogleCivic do
 
   describe ".delegate" do
     it "should delegate missing methods to GoogleCivic::Client" do
-      stub_get("/elections?key").
+      stub_get("/elections?key=").
         to_return(:status => 200, :body => fixture("elections.json"), :headers => {})
       elections = GoogleCivic.elections
       elections.first.should == ["kind", "civicinfo#electionsqueryresponse"]
