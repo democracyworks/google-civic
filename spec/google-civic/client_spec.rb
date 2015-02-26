@@ -2,7 +2,7 @@ require 'helper'
 
 describe GoogleCivic::Client do
   it 'should work with an api key' do
-    stub_get("https://www.googleapis.com/civicinfo/us_v1/elections?key=abc123").
+    stub_get("https://www.googleapis.com/civicinfo/v2/elections?key=abc123").
       with(:headers => {'Accept'=>'*/*'}).
       to_return(:status => 200, :body => '', :headers => {})
     proc {
@@ -25,17 +25,15 @@ describe GoogleCivic::Client do
 
   describe "#voter_info" do
     it "should return the voter information from an address" do
-      stub_post("/voterinfo/2000/lookup?key=abc123").
-       with(:body => "{\"address\":\"1263 Pacific Ave. Kansas City KS\"}").
-        to_return(:status => 200, :body => fixture("voter_info.json"), :headers => {})
+      stub_get("/voterinfo?electionId=2000&address=1263+Pacific+Ave.+Kansas+City+KS&key=abc123").
+       to_return(:status => 200, :body => fixture("voter_info.json"), :headers => {})
       voter_info = @client.voter_info(2000, "1263 Pacific Ave. Kansas City KS")
       voter_info.election.name.should eql "VIP Test Election"
     end
 
     it "should take a query parameter" do
-      stub_post("/voterinfo/2000/lookup?includeOffices=true&key=abc123").
-       with(:body => "{\"address\":\"1263 Pacific Ave. Kansas City KS\"}").
-        to_return(:status => 200, :body => fixture("voter_info.json"), :headers => {})
+      stub_get("/voterinfo?electionId=2000&address=1263+Pacific+Ave.+Kansas+City+KS&includeOffices=true&key=abc123").
+       to_return(:status => 200, :body => fixture("voter_info.json"), :headers => {})
       voter_info = @client.voter_info(2000, "1263 Pacific Ave. Kansas City KS", {includeOffices: true})
       voter_info.election.name.should eql "VIP Test Election"
     end
@@ -43,9 +41,8 @@ describe GoogleCivic::Client do
 
   describe "#representative_info" do
     it "should return the representative information from an address" do
-     stub_post("/representatives/lookup?key=abc123").
-       with(:body => "{\"address\":\"1263 Pacific Ave. Kansas City KS\"}").
-        to_return(:status => 200, :body => fixture("representative.json"), :headers => {})
+     stub_get("/representatives?address=1263+Pacific+Ave.+Kansas+City+KS&key=abc123").
+       to_return(:status => 200, :body => fixture("representative.json"), :headers => {})
       rep_info = @client.representative_info("1263 Pacific Ave. Kansas City KS")
       rep_info.offices.first[1].name.should eql "United States House of Representatives KS-03"
     end
