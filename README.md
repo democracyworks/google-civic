@@ -28,6 +28,22 @@ Make sure to obtain your API key from here [https://developers.google.com/civic-
     b = @client.voter_info(2000, '1263 Pacific Ave. Kansas City KS')
     b.pollingLocations.first.address # => #<Hashie::Mash city="Kansas City" line1="100 S 20th St" line2="" line3="" locationName="National Guard Armory" state="KS" zip="66102 ">
 
+    # Voter info with backoff retries (up to 6 calls, 2 second pause between each, see below)
+    b = @client.voter_info(2000, '1263 Pacific Ave. Kansas City KS', {connection: {retry: {max: 5, interval: 2}}})
+
+## Backoff Retries
+All of the client methods now take an optional `:connection` hash in the options. These options
+will be passed through to the connection. Additionally, options under a `:retry` symbol key will trigger
+the use of backoff retries. You can use the following retry parameters:
+
+* `:max` - the maximum number of retries (default: 2)
+* `:interval` - the pause in seconds between retries (default: 0)
+* `:interval_randomness` - the maximum random interval amount expressed as a float between 0 and 1 in addition to the interval (default: 0)
+* `:max_interval` - an upper limit for the interval (default: Float::MAX)
+* `:backoff_factor` - the amount to multiply each successive retry's interval amount by in order to provide backoff (default: 1)
+
+The retries are triggered by use of a customized exception and config for the Faraday::Request::Retry middleware. As such, use of the `:exceptions` is not allowed, use of `:methods` isn't needed (all the requests to the API are GET), and use of `:retry_if` might work but hasn't been tested.
+
 ## Contributing
 In the spirit of [free software][free-sw], **everyone** is encouraged to help improve
 this project.
