@@ -1,0 +1,13 @@
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "internalError",
+    "message": "A different internal error has occured."
+   }
+  ],
+  "code": 502,
+  "message": "A different internal error has occured."
+ }
+}
