@@ -18,7 +18,7 @@ module GoogleCivic
     # @example List the current elections
     #   GoogleCivic.elections
     def elections(options={})
-      connection_options = options.delete(:connection) {|el| {}}
+      connection_options = options.delete(:connection) {|_| {}}
       get("elections", options, connection_options)
     end
 
@@ -33,7 +33,7 @@ module GoogleCivic
     # @example List information around the voter
     #   GoogleCivic.voter_info(200, '1263 Pacific Ave. Kansas City KS')
     def voter_info(election_id, address, options={})
-      connection_options = options.delete(:connection) {|el| {}}
+      connection_options = options.delete(:connection) {|_| {}}
       get("voterinfo", {electionId: election_id, address: address}.merge(options), connection_options)
     end
 
@@ -47,7 +47,7 @@ module GoogleCivic
     # @example List information about the representatives
     #   GoogleCivic.representative_info('1263 Pacific Ave. Kansas City KS')
     def representative_info(address, options={})
-      connection_options = options.delete(:connection) {|el| {}}
+      connection_options = options.delete(:connection) {|_| {}}
       get("representatives", {address: address}.merge(options), connection_options)
     end
 
