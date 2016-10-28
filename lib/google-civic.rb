@@ -1,4 +1,5 @@
 require 'google-civic/client'
+require 'google-civic/error_on_retriable_response'
 
 module GoogleCivic
   class << self

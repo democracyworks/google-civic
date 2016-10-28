@@ -1,0 +1,13 @@
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "rateLimitExceeded",
+    "message": "The rate limit has currently been exceeded."
+   }
+  ],
+  "code": 403,
+  "message": "The rate limit has currently been exceeded."
+ }
+}
