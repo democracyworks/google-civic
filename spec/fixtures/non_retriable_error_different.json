@@ -1,0 +1,13 @@
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "quotaExceeded",
+    "message": "The quota has been exceeded, STAHP!"
+   }
+  ],
+  "code": 403,
+  "message": "maximum quota reached, STAHP!"
+ }
+}

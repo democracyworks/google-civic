@@ -37,6 +37,46 @@ describe GoogleCivic::Client do
       voter_info = @client.voter_info(2000, "1263 Pacific Ave. Kansas City KS", {includeOffices: true})
       voter_info.election.name.should eql "VIP Test Election"
     end
+
+    it "should retry on server error when connection_options includes retry config" do
+      retry_config = {max: 10, interval: 2}
+      stub_get("/voterinfo?electionId=2000&address=1263+Pacific+Ave.+Kansas+City+KS&key=abc123").
+       to_return({:status => 500, :body => fixture("server_error.json")},
+                 {:status => 200, :body => fixture("voter_info.json")})
+      voter_info = @client.voter_info(2000, "1263 Pacific Ave. Kansas City KS", {connection: {retry: retry_config}})
+      voter_info.election.name.should eql "VIP Test Election"
+    end
+
+    it "should retry on retriable error when connection_options includes retry config" do
+      retry_config = {max: 10, interval: 2}
+      stub_get("/voterinfo?electionId=2000&address=1263+Pacific+Ave.+Kansas+City+KS&key=abc123").
+       to_return({:status => 403, :body => fixture("retriable_error.json")},
+                 {:status => 200, :body => fixture("voter_info.json")})
+      voter_info = @client.voter_info(2000, "1263 Pacific Ave. Kansas City KS", {connection: {retry: retry_config}})
+      voter_info.election.name.should eql "VIP Test Election"
+    end
+
+    it "should not retry more than the count" do
+      retry_config = {max: 2, interval: 1}
+      stub_get("/voterinfo?electionId=2000&address=1263+Pacific+Ave.+Kansas+City+KS&key=abc123").
+       to_return({:status => 500, :body => fixture("server_error.json")},
+                 {:status => 500, :body => fixture("server_error.json")},
+                 {:status => 502, :body => fixture("server_error_different.json")})
+      voter_info = @client.voter_info(2000, "1263 Pacific Ave. Kansas City KS", {connection: {retry: retry_config}})
+      voter_info.error.code.should eql 502
+      voter_info.error.message.should eql "A different internal error has occured."
+    end
+
+    it "should not retry on a non-retriable error" do
+      retry_config = {max: 2, interval: 1}
+      stub_get("/voterinfo?electionId=2000&address=1263+Pacific+Ave.+Kansas+City+KS&key=abc123").
+       to_return({:status => 403, :body => fixture("non_retriable_error.json")},
+                 {:status => 403, :body => fixture("non_retriable_error_different.json")})
+      voter_info = @client.voter_info(2000, "1263 Pacific Ave. Kansas City KS", {connection: {retry: retry_config}})
+      voter_info.error.code.should eql 403
+      voter_info.error.message.should eql "maximum quota reached"
+    end
+
   end
 
   describe "#representative_info" do
